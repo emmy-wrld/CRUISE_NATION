@@ -216,6 +216,239 @@
             <p>Hey there, vibers! Ask me anything about the group's vibes, rules, or just say 'give me a fun fact' and let's get this party started! 🎉</p>
           </div>
         </div>
+        <!-- FIX APPLIED HERE: Added `min-w-0` to the input to prevent overflow on small screens -->
+        <div class="w-full flex">
+          <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 min-w-0 p-4 rounded-l-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500">
+          <button id="chat-send-btn" class="bg-green-500 text-white font-bold py-4 px-6 rounded-r-full hover:bg-green-600 transition-colors duration-300">
+            Send
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-800 text-gray-400 text-center py-12 mt-16 rounded-t-3xl shadow-inner">
+      <div class="container mx-auto max-w-4xl">
+        <button id="modeToggleBtn" class="btn bg-gray-700 text-white font-bold py-3 px-6 rounded-full mb-6 transition-transform hover:scale-105">
+          🌗 Toggle Dark Mode
+        </button>
+        <div class="flex justify-center space-x-6 mb-6">
+          <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors">Rules</a>
+        </div>
+        <p class="text-sm">&copy; 2025 Cruise Nation. Built with love, vibes, and zero stress. 💚</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ======================== JAVASCRIPT LOGIC ======================== -->
+  <script>
+    // Constants and state management
+    const apiKey = ""; // API key is handled by the canvas environment
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=" + apiKey;
+    const chatHistory = [{
+      role: "user",
+      parts: [{
+        text: "You are the 'Vibe Master Bot' from a super fun WhatsApp group called 'Cruise Nation'. Your responses should be playful, friendly, and full of positive vibes and humor. Use lots of emojis like 😂, 🔥, 🎉, and 😎. Your core purpose is to give off a fun, laid-back energy. Never be serious or formal."
+      }]
+    }];
+
+    // --- SOUND EFFECTS ---
+    const synth = new Tone.Synth().toDestination();
+
+    function playClickSound() {
+      // Play a quick, friendly sound
+      synth.triggerAttackRelease("C4", "8n");
+    }
+
+    // --- SPLASH SCREEN LOGIC ---
+    setTimeout(() => {
+      document.getElementById('splash1').classList.add('hidden');
+      document.getElementById('splash2').classList.remove('hidden');
+    }, 2500);
+
+    setTimeout(() => {
+      document.getElementById('splash2').classList.add('hidden');
+      document.getElementById('mainSite').style.display = 'block';
+      launchEmojis();
+    }, 5000);
+
+    // --- COUNTDOWN LOGIC ---
+    function updateCountdown() {
+      const target = new Date("Aug 29, 2025 20:00:00").getTime();
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff > 0) {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m ${s}s`;
+      } else {
+        document.getElementById("countdown").innerText = "🎉 It's Cruise Time! The party has started!";
+      }
+    }
+    setInterval(updateCountdown, 1000);
+
+    // --- FLOATING EMOJIS ---
+    function launchEmojis() {
+      const emojis = ["😂", "🔥", "❤️", "🎉", "😎", "🚀", "💡", "🙌", "🤙"];
+      setInterval(() => {
+        const e = document.createElement("div");
+        e.className = "emoji-float";
+        e.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        e.style.left = Math.random() * 100 + "vw";
+        e.style.animationDuration = (4 + Math.random() * 3) + "s";
+        document.body.appendChild(e);
+        setTimeout(() => e.remove(), 7000);
+      }, 500);
+    }
+
+    // --- VIBE CHECK LOGIC ---
+    document.getElementById('vibeCheckBtn').addEventListener('click', () => {
+      playClickSound();
+      const vibes = [{
+        text: "You're on a high vibe! Ready to cruise!",
+        emoji: "🚀"
+      }, {
+        text: "Your vibe is super chill. 😎",
+        emoji: "😌"
+      }, {
+        text: "You're a meme lord in the making. 😂",
+        emoji: "🤣"
+      }, {
+        text: "Your vibe is pure fire! 🔥",
+        emoji: "💯"
+      }, {
+        text: "You're bringing the party energy! 🎉",
+        emoji: "🥳"
+      }];
+      const randomVibe = vibes[Math.floor(Math.random() * vibes.length)];
+      const vibeResult = document.getElementById('vibeResult');
+      const vibeText = document.getElementById('vibeText');
+      const vibeEmoji = document.getElementById('vibeEmoji');
+
+      vibeText.innerText = randomVibe.text;
+      vibeEmoji.innerText = randomVibe.emoji;
+
+      vibeResult.style.display = 'block';
+      vibeResult.classList.remove('opacity-0', 'scale-95');
+      vibeResult.classList.add('opacity-100', 'scale-100');
+    });
+
+    // --- CHATBOT LOGIC ---
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    const chatBox = document.getElementById('chat-box');
+
+    async function sendMessage() {
+      const userMessage = chatInput.value.trim();
+      if (!userMessage) return;
+
+      playClickSound();
+
+      // Add user message to chat box
+      const userBubble = document.createElement('div');
+      userBubble.className = 'chat-bubble bg-green-500 text-white rounded-2xl p-4 self-end max-w-[80%]';
+      userBubble.innerHTML = `<p>${userMessage}</p>`;
+      chatBox.appendChild(userBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      chatInput.value = '';
+      chatInput.disabled = true;
+      chatSendBtn.disabled = true;
+
+      // Add loading indicator
+      const botTyping = document.createElement('div');
+      botTyping.className = 'chat-bubble bg-gray-300 dark:bg-gray-600 rounded-2xl p-4 self-start max-w-[80%]';
+      botTyping.innerHTML = `<p class="italic text-gray-500 dark:text-gray-400">Vibe Master is typing...</p>`;
+      chatBox.appendChild(botTyping);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const payload = {
+          contents: chatHistory.concat([{
+            role: "user",
+            parts: [{
+              text: userMessage
+            }]
+          }])
+        };
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`API call failed with status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        const botResponse = result.candidates[0]?.content?.parts[0]?.text || "Vibe lost... but we'll find it! Try again!";
+
+        chatHistory.push({
+          role: "user",
+          parts: [{
+            text: userMessage
+          }]
+        });
+        chatHistory.push({
+          role: "model",
+          parts: [{
+            text: botResponse
+          }]
+        });
+
+        // Replace loading indicator with bot response
+        botTyping.remove();
+        const botBubble = document.createElement('div');
+        botBubble.className = 'chat-bubble bg-gray-300 dark:bg-gray-600 rounded-2xl p-4 self-start max-w-[80%]';
+        botBubble.innerHTML = `<p class="font-bold text-lg mb-1">Vibe Master Bot</p><p>${botResponse}</p>`;
+        chatBox.appendChild(botBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        console.error("Error fetching from Gemini API:", error);
+        botTyping.remove();
+        const errorBubble = document.createElement('div');
+        errorBubble.className = 'chat-bubble bg-red-500 text-white rounded-2xl p-4 self-start max-w-[80%]';
+        errorBubble.innerHTML = `<p>Error: Could not connect to the Vibe Master. Maybe the internet is on a cruise? Try again later.</p>`;
+        chatBox.appendChild(errorBubble);
+      } finally {
+        chatInput.disabled = false;
+        chatSendBtn.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    chatSendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    // --- DARK MODE TOGGLE ---
+    const modeToggleBtn = document.getElementById('modeToggleBtn');
+    modeToggleBtn.addEventListener('click', () => {
+      playClickSound();
+      document.body.classList.toggle('dark');
+    });
+  </script>
+</body>
+</html>
+
+ flex flex-col space-y-4">
+          <div class="chat-bubble bg-gray-300 dark:bg-gray-600 rounded-2xl p-4 self-start max-w-[80%]">
+            <p class="font-bold text-lg mb-1">Vibe Master Bot</p>
+            <p>Hey there, vibers! Ask me anything about the group's vibes, rules, or just say 'give me a fun fact' and let's get this party started! 🎉</p>
+          </div>
+        </div>
         <div class="w-full flex">
           <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 p-4 rounded-l-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500">
           <button id="chat-send-btn" class="bg-green-500 text-white font-bold py-4 px-6 rounded-r-full hover:bg-green-600 transition-colors duration-300">
@@ -441,5 +674,3 @@
   </script>
 </body>
 </html>
-
-
