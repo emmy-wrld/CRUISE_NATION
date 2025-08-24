@@ -7,69 +7,53 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background: #f0f4f8;
       color: #333;
       overflow-x: hidden;
+      transition: background 0.5s, color 0.5s;
     }
 
-    /* --- SPLASH SCREENS --- */
+    /* --- DARK MODE --- */
+    body.dark {
+      background: #121212;
+      color: #eee;
+    }
+    body.dark .card, body.dark section {
+      background: #1f1f1f;
+      color: #eee;
+    }
+
+    /* --- SPLASH --- */
     .splash {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: #25D366;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       flex-direction: column;
       color: white;
       font-size: 2em;
       z-index: 1000;
       transition: opacity 1s ease;
     }
-
-    .splash.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .splash h1 {
-      margin: 0;
-      animation: bounce 2s infinite;
-    }
-
+    .splash.hidden { opacity: 0; pointer-events: none; }
+    .splash h1 { animation: bounce 2s infinite; }
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
 
-    /* --- MAIN SITE STYLES --- */
+    /* --- HEADER --- */
     header {
       background: linear-gradient(135deg, #25D366, #128C7E);
       color: white;
       text-align: center;
       padding: 80px 20px;
+      position: relative;
     }
-
-    header h1 {
-      font-size: 3em;
-      margin: 0;
-    }
-
-    header p {
-      font-size: 1.3em;
-      margin-top: 15px;
-    }
-
-    section {
-      padding: 60px 20px;
-      max-width: 900px;
-      margin: auto;
-      text-align: center;
-    }
-
+    header h1 { font-size: 3em; margin: 0; }
+    header p { font-size: 1.3em; margin-top: 15px; }
     .btn {
       display: inline-block;
       margin-top: 20px;
@@ -82,10 +66,27 @@
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       transition: 0.3s;
     }
+    .btn:hover { background: #1ebe5d; transform: scale(1.05); }
 
-    .btn:hover {
-      background: #1ebe5d;
-      transform: scale(1.05);
+    /* --- FLOATING EMOJIS --- */
+    .emoji {
+      position: absolute;
+      font-size: 2rem;
+      animation: float 6s linear infinite;
+      opacity: 0.7;
+    }
+    @keyframes float {
+      from { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      20% { opacity: 1; }
+      to { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* --- SECTIONS --- */
+    section {
+      padding: 60px 20px;
+      max-width: 900px;
+      margin: auto;
+      text-align: center;
     }
 
     .cards {
@@ -94,7 +95,6 @@
       gap: 20px;
       margin-top: 40px;
     }
-
     .card {
       background: white;
       border-radius: 15px;
@@ -102,11 +102,32 @@
       box-shadow: 0 5px 20px rgba(0,0,0,0.1);
       transition: 0.3s;
     }
+    .card:hover { transform: translateY(-10px); }
 
-    .card:hover {
-      transform: translateY(-10px);
+    /* --- GALLERY --- */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+    .gallery img:hover { transform: scale(1.05); }
+
+    /* --- REACTIONS --- */
+    .reactions span {
+      font-size: 2rem;
+      margin: 10px;
+      cursor: pointer;
+      user-select: none;
     }
 
+    /* --- FOOTER --- */
     footer {
       background: #222;
       color: #aaa;
@@ -132,6 +153,7 @@
 
   <!-- MAIN SITE -->
   <div id="mainSite" style="display:none;">
+
     <!-- HERO -->
     <header>
       <h1>🎉 Welcome to Cruise Nation 🎉</h1>
@@ -149,6 +171,12 @@
       </p>
     </section>
 
+    <!-- COUNTDOWN -->
+    <section>
+      <h2>Next Cruise Friday 🎊</h2>
+      <p id="countdown" style="font-size:1.5em; font-weight:bold; color:#25D366;"></p>
+    </section>
+
     <!-- WHY JOIN -->
     <section>
       <h2>Why Join Us? 💡</h2>
@@ -160,6 +188,17 @@
       </div>
     </section>
 
+    <!-- GALLERY -->
+    <section>
+      <h2>Group Gallery 📸</h2>
+      <div class="gallery">
+        <img src="https://via.placeholder.com/200" alt="Meme 1">
+        <img src="https://via.placeholder.com/200" alt="Meme 2">
+        <img src="https://via.placeholder.com/200" alt="Screenshot 1">
+        <img src="https://via.placeholder.com/200" alt="Fun 1">
+      </div>
+    </section>
+
     <!-- TESTIMONIALS -->
     <section>
       <h2>What Our Members Say ❤️</h2>
@@ -167,6 +206,17 @@
         <div class="card">“This group makes me laugh even on bad days 😂”</div>
         <div class="card">“I met amazing friends here 🙌”</div>
         <div class="card">“Cruise Nation = daily dose of joy 🔥”</div>
+      </div>
+    </section>
+
+    <!-- REACTIONS -->
+    <section>
+      <h2>Drop a Reaction 😍</h2>
+      <div class="reactions">
+        <span onclick="react('😂')">😂 <span id="😂count">0</span></span>
+        <span onclick="react('🔥')">🔥 <span id="🔥count">0</span></span>
+        <span onclick="react('❤️')">❤️ <span id="❤️count">0</span></span>
+        <span onclick="react('👍')">👍 <span id="👍count">0</span></span>
       </div>
     </section>
 
@@ -187,21 +237,65 @@
 
     <!-- FOOTER -->
     <footer>
+      <button onclick="toggleMode()" style="margin-bottom:10px;">🌗 Toggle Dark Mode</button>
       <p>© 2025 Cruise Nation | Built for the vibes 💚</p>
     </footer>
   </div>
 
+  <!-- JS -->
   <script>
-    // Show splash screens in sequence
+    // Splash Screens
     setTimeout(() => {
       document.getElementById('splash1').classList.add('hidden');
       document.getElementById('splash2').classList.remove('hidden');
-    }, 2500); // 2.5 seconds first screen
-
+    }, 2500);
     setTimeout(() => {
       document.getElementById('splash2').classList.add('hidden');
       document.getElementById('mainSite').style.display = 'block';
-    }, 5000); // after 5 seconds show main site
+      launchEmojis();
+    }, 5000);
+
+    // Countdown
+    function updateCountdown() {
+      const target = new Date("Aug 29, 2025 20:00:00").getTime();
+      const now = new Date().getTime();
+      const diff = target - now;
+      if (diff > 0) {
+        const d = Math.floor(diff/(1000*60*60*24));
+        const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+        const m = Math.floor((diff%(1000*60*60))/(1000*60));
+        const s = Math.floor((diff%(1000*60))/1000);
+        document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m ${s}s`;
+      } else {
+        document.getElementById("countdown").innerText = "🎉 It's Cruise Time!";
+      }
+    }
+    setInterval(updateCountdown, 1000);
+
+    // Reactions
+    function react(emoji) {
+      const span = document.getElementById(emoji+"count");
+      span.innerText = parseInt(span.innerText) + 1;
+    }
+
+    // Dark Mode
+    function toggleMode() {
+      document.body.classList.toggle('dark');
+    }
+
+    // Floating emojis
+    function launchEmojis() {
+      const emojis = ["😂","🔥","❤️","🎉","😎"];
+      setInterval(() => {
+        const e = document.createElement("div");
+        e.className = "emoji";
+        e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+        e.style.left = Math.random()*100 + "vw";
+        e.style.animationDuration = (4+Math.random()*3)+"s";
+        document.body.appendChild(e);
+        setTimeout(()=>e.remove(),7000);
+      }, 1000);
+    }
   </script>
 </body>
 </html>
